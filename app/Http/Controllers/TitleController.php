@@ -11,9 +11,18 @@ class TitleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+    // ログインユーザーが作成したTitleを取得
+    $titles = $request->user()
+        ->titles()                     // Userモデルのリレーションを利用
+        ->with('thoughts.tag')         // thoughtsとtagをまとめて取得
+        ->get();
+
+    return response()->json([
+        'message' => 'Your titles retrieved successfully',
+        'data'    => $titles,
+    ]);
     }
 
     /**
