@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('genre', 50);
             $table->string('title');
-            $table->string('author')->nullable();
+            $table->string('author');
             $table->boolean('like')->default(false);
             $table->timestamps();
         });
