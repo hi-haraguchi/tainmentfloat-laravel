@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Thought;
+use App\Models\Title;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 
 class ThoughtController extends Controller
@@ -26,9 +28,46 @@ class ThoughtController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+     public function storeForTitle(Request $request, Title $title)
     {
-        //
+        // 他人のタイトルに追加できないように制御
+        if ($title->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        // バリデーション
+        $validated = $request->validate([
+            'year'    => 'required|integer',
+            'month'   => 'nullable|integer',
+            'day'     => 'nullable|integer',
+            'part'    => 'nullable|string|max:255',
+            'thought' => 'nullable|string',
+            'tag'     => 'nullable|string|max:255',
+            'link'    => 'nullable|string',
+        ]);
+
+        // タグ処理
+        $tagId = null;
+        if (!empty($validated['tag'])) {
+            $tag = Tag::firstOrCreate(['tag' => $validated['tag']]);
+            $tagId = $tag->id;
+        }
+
+        // Thoughtを作成
+        $thought = $title->thoughts()->create([
+            'year'    => $validated['year'],
+            'month'   => $validated['month'] ?? null,
+            'day'     => $validated['day'] ?? null,
+            'part'    => $validated['part'] ?? null,
+            'thought' => $validated['thought'] ?? null,
+            'tag_id'  => $tagId,
+            'link'    => $validated['link'] ?? null,
+        ]);
+
+        return response()->json([
+            'message' => 'Thought added successfully',
+            'data'    => $thought->load('tag', 'title'),
+        ], 201);
     }
 
     /**

@@ -89,9 +89,14 @@ class TitleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Title $title)
+    public function show($id)
     {
-        //
+    // ログインユーザーのtitleのみ取得
+    $title = \App\Models\Title::where('user_id', auth()->id())
+        ->with('thoughts.tag') // thoughts と tag をまとめて取得
+        ->findOrFail($id);
+
+    return response()->json($title);
     }
 
     /**
