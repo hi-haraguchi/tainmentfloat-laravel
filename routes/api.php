@@ -13,6 +13,9 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 // ここから下はすべて認証必須
 Route::middleware(['auth:sanctum'])->group(function () {
+
+    Route::get('/titles/search', [TitleController::class, 'search']);
+
     Route::apiResource('titles', TitleController::class);
     Route::apiResource('tags', TagController::class);
     Route::apiResource('thoughts', ThoughtController::class);
@@ -20,6 +23,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/titles/{id}/edit-data', [TitleController::class, 'editData']);
     Route::get('/thoughts/{id}/edit-data', [ThoughtController::class, 'editData']);
     Route::get('/tags', [\App\Http\Controllers\TagController::class, 'indexShared']);
+    Route::get('/timeline', [TitleController::class, 'timeline']);
+
+
 
 
 });

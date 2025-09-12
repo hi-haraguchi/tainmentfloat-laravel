@@ -127,10 +127,10 @@ class TitleController extends Controller
     // 更新
     $title->update($validated);
 
-    return response()->json([
-        'message' => 'Title updated successfully',
-        'data'    => $title,
-    ]);
+        return response()->json([
+            'message' => 'Title updated successfully',
+            'data'    => $title,
+        ]);
     }
 
 
@@ -139,13 +139,13 @@ class TitleController extends Controller
      */
     public function destroy($id)
     {
-    $title = \App\Models\Title::where('user_id', auth()->id())->findOrFail($id);
+        $title = \App\Models\Title::where('user_id', auth()->id())->findOrFail($id);
 
-    $title->delete(); // cascadeOnDelete で thoughts も削除される
+        $title->delete(); // cascadeOnDelete で thoughts も削除される
 
-    return response()->json([
-        'message' => 'Title and related thoughts deleted successfully'
-    ]);
+        return response()->json([
+            'message' => 'Title and related thoughts deleted successfully'
+        ]);
     }
 
 
@@ -157,5 +157,70 @@ class TitleController extends Controller
 
     return response()->json($title);
     }
+
+    public function search(Request $request)
+    {
+    $query = $request->input('q');
+
+    $titles = \App\Models\Title::where('user_id', auth()->id()) // 自分の記録だけ
+        ->where(function ($q) use ($query) {
+            $q->where('title', 'like', "%{$query}%")
+                ->orWhere('author', 'like', "%{$query}%")
+                ->orWhereHas('thoughts', function ($q2) use ($query) {
+                    $q2->where('part', 'like', "%{$query}%")
+                        ->orWhere('thought', 'like', "%{$query}%")
+                        ->orWhereHas('tag', function ($q3) use ($query) {
+                            $q3->where('tag', 'like', "%{$query}%");
+                    });
+            });
+        })
+        ->with('thoughts.tag') // thoughts と tag を同時に取得
+        ->get();
+
+    return response()->json([
+        'message' => 'Search results',
+        'data'    => $titles,
+    ]);
+    }
+
+    public function timeline(Request $request)
+{
+    $titles = \App\Models\Title::where('user_id', auth()->id())
+        ->with(['thoughts.tag'])
+        ->get();
+
+    // thoughtsをyear, monthごとにまとめる
+    $timeline = [];
+    foreach ($titles as $title) {
+        foreach ($title->thoughts as $thought) {
+            $year = $thought->year;
+            $month = $thought->month ?? '00'; // 月が無い場合は "00" とする
+
+            $timeline[$year][$month][] = [
+                'id'     => $title->id,
+                'genre'  => $title->genre,
+                'title'  => $title->title,
+                'author' => $title->author,
+                'thought'=> $thought->thought,
+                'tag'    => $thought->tag?->tag,
+                'day'    => $thought->day,
+            ];
+        }
+    }
+
+ krsort($timeline); // 年は降順（新しい年から）
+
+foreach ($timeline as &$months) {
+    uksort($months, function($a, $b) {
+        if ($a === '00') return 1;   // 月なしを最後に
+        if ($b === '00') return -1;
+        return intval($b) <=> intval($a); // 月は数値で降順（12 → 1）
+    });
+}
+
+    return response()->json($timeline);
+}
+
+
 
 }
