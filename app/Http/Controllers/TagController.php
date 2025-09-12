@@ -9,8 +9,9 @@ class TagController extends Controller
 {
 
     public function indexShared(Request $request)
-    {
+{
     $query = $request->input('q'); // 検索ワード（任意）
+    $user = $request->user();      // ログインユーザー
 
     $tags = \App\Models\Tag::when($query, function ($q) use ($query) {
             $q->where('tag', 'like', "%{$query}%");
@@ -23,23 +24,28 @@ class TagController extends Controller
             }]);
         }])
         ->get()
-        ->map(function ($tag) {
+        ->map(function ($tag) use ($user) {
             return [
                 'id'   => $tag->id,
                 'tag'  => $tag->tag,
-                'records' => $tag->thoughts->map(function ($thought) {
+                'records' => $tag->thoughts->map(function ($thought) use ($user) {
                     return [
-                        'genre'  => $thought->title->genre,
-                        'title'  => $thought->title->title,
-                        'author' => $thought->title->author,
-                        'part'   => $thought->part,
+                        'thought_id' => $thought->id,
+                        'genre'      => $thought->title->genre,
+                        'title'      => $thought->title->title,
+                        'author'     => $thought->title->author,
+                        'part'       => $thought->part,
+                        // すでにブックマークしているかチェック
+                        'bookmarked' => $user 
+                            ? $user->bookmarks()->where('thought_id', $thought->id)->exists()
+                            : false,
                     ];
                 }),
             ];
         });
 
     return response()->json($tags);
-    }
+}
 
     /**
      * Display a listing of the resource.

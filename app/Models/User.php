@@ -51,4 +51,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Title::class);
     }
+
+    public function bookmarks()
+    {
+    return $this->belongsToMany(Thought::class, 'bookmarks')
+                ->withTimestamps();
+    }
 }
