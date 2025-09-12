@@ -25,6 +25,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/thoughts/{id}/edit-data', [ThoughtController::class, 'editData']);
     Route::get('/tags', [\App\Http\Controllers\TagController::class, 'indexShared']);
     Route::get('/timeline', [TitleController::class, 'timeline']);
+    Route::get('/bookmarks/mine', [BookmarkController::class, 'indexMine']);
     Route::post('/bookmarks', [BookmarkController::class, 'store']);
     Route::delete('/bookmarks/{thought}', [BookmarkController::class, 'destroy']);
 

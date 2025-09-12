@@ -100,4 +100,26 @@ class BookmarkController extends Controller
 
         return response()->json(['message' => 'Bookmark removed']);
     }
+
+    public function indexMine(Request $request)
+    {
+    $user = $request->user();
+
+    $bookmarks = $user->bookmarks()
+        ->with(['title:id,genre,title,author', 'tag:id,tag'])
+        ->get()
+        ->map(function ($thought) {
+            return [
+                'thought_id' => $thought->id,
+                'genre'      => $thought->title->genre,
+                'title'      => $thought->title->title,
+                'author'     => $thought->title->author,
+                'part'       => $thought->part,
+                'thought'    => $thought->thought,
+                'tag'        => $thought->tag?->tag,
+            ];
+        });
+
+    return response()->json($bookmarks);
+    }
 }
