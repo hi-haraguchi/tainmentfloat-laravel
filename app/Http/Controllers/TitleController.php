@@ -137,10 +137,17 @@ class TitleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Title $title)
+    public function destroy($id)
     {
-        //
+    $title = \App\Models\Title::where('user_id', auth()->id())->findOrFail($id);
+
+    $title->delete(); // cascadeOnDelete で thoughts も削除される
+
+    return response()->json([
+        'message' => 'Title and related thoughts deleted successfully'
+    ]);
     }
+
 
     public function editData($id)
     {
