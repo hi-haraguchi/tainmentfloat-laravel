@@ -30,4 +30,11 @@ class Thought extends Model
     {
         return $this->belongsTo(Tag::class);
     }
+
+    public function bookmarkedBy()
+    {
+    return $this->belongsToMany(User::class, 'bookmarks')
+                ->withTimestamps();
+    }
+
 }

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TitleController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ThoughtController;
+use App\Http\Controllers\BookmarkController;
 
 // 認証しているユーザー情報を返すAPI
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
@@ -24,6 +25,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/thoughts/{id}/edit-data', [ThoughtController::class, 'editData']);
     Route::get('/tags', [\App\Http\Controllers\TagController::class, 'indexShared']);
     Route::get('/timeline', [TitleController::class, 'timeline']);
+    Route::post('/bookmarks', [BookmarkController::class, 'store']);
+    Route::delete('/bookmarks/{thought}', [BookmarkController::class, 'destroy']);
 
 
 
