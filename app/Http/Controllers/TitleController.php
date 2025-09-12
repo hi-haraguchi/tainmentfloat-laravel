@@ -110,10 +110,29 @@ class TitleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Title $title)
+    public function update(Request $request, $id)
     {
-        //
+    // ログインユーザーのTitleのみ取得
+    $title = \App\Models\Title::where('user_id', auth()->id())
+        ->findOrFail($id);
+
+    // バリデーション
+    $validated = $request->validate([
+        'genre'  => 'required|string|max:50',
+        'title'  => 'required|string|max:255',
+        'author' => 'required|string|max:255',
+        'like'   => 'boolean',
+    ]);
+
+    // 更新
+    $title->update($validated);
+
+    return response()->json([
+        'message' => 'Title updated successfully',
+        'data'    => $title,
+    ]);
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -122,4 +141,14 @@ class TitleController extends Controller
     {
         //
     }
+
+    public function editData($id)
+    {
+    $title = \App\Models\Title::where('user_id', auth()->id())
+        ->select('id', 'genre', 'title', 'author', 'like') // 必要なカラムだけ
+        ->findOrFail($id);
+
+    return response()->json($title);
+    }
+
 }
