@@ -19,6 +19,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/titles/{title}/thoughts', [ThoughtController::class, 'storeForTitle']);
     Route::get('/titles/{id}/edit-data', [TitleController::class, 'editData']);
     Route::get('/thoughts/{id}/edit-data', [ThoughtController::class, 'editData']);
+    Route::get('/tags', [\App\Http\Controllers\TagController::class, 'indexShared']);
 
 
 });

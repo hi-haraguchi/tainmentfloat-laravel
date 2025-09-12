@@ -7,6 +7,40 @@ use Illuminate\Http\Request;
 
 class TagController extends Controller
 {
+
+    public function indexShared(Request $request)
+    {
+    $query = $request->input('q'); // 検索ワード（任意）
+
+    $tags = \App\Models\Tag::when($query, function ($q) use ($query) {
+            $q->where('tag', 'like', "%{$query}%");
+        })
+        ->with(['thoughts' => function ($q) {
+            $q->whereHas('title', function ($q2) {
+                $q2->where('genre', '!=', 'その他'); // 「その他」を除外
+            })->with(['title' => function ($q3) {
+                $q3->select('id', 'genre', 'title', 'author');
+            }]);
+        }])
+        ->get()
+        ->map(function ($tag) {
+            return [
+                'id'   => $tag->id,
+                'tag'  => $tag->tag,
+                'records' => $tag->thoughts->map(function ($thought) {
+                    return [
+                        'genre'  => $thought->title->genre,
+                        'title'  => $thought->title->title,
+                        'author' => $thought->title->author,
+                        'part'   => $thought->part,
+                    ];
+                }),
+            ];
+        });
+
+    return response()->json($tags);
+    }
+
     /**
      * Display a listing of the resource.
      */
