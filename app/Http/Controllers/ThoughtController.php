@@ -89,10 +89,50 @@ class ThoughtController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Thought $thought)
+    public function update(Request $request, $id)
     {
-        //
+    // Thought + Title を取得して所有者チェック
+    $thought = \App\Models\Thought::with('title')->findOrFail($id);
+
+    if ($thought->title->user_id !== auth()->id()) {
+        return response()->json(['message' => 'Forbidden'], 403);
     }
+
+    // バリデーション
+    $validated = $request->validate([
+        'year'    => 'required|integer',
+        'month'   => 'nullable|integer',
+        'day'     => 'nullable|integer',
+        'part'    => 'nullable|string|max:255',
+        'thought' => 'nullable|string',
+        'tag'     => 'nullable|string|max:255',
+        'link'    => 'nullable|string',
+    ]);
+
+    // タグ処理
+    $tagId = null;
+    if (!empty($validated['tag'])) {
+        $tag = \App\Models\Tag::firstOrCreate(['tag' => $validated['tag']]);
+        $tagId = $tag->id;
+    }
+
+    // 更新
+    $thought->update([
+        'year'    => $validated['year'],
+        'month'   => $validated['month'] ?? null,
+        'day'     => $validated['day'] ?? null,
+        'part'    => $validated['part'] ?? null,
+        'thought' => $validated['thought'] ?? null,
+        'tag_id'  => $tagId,
+        'link'    => $validated['link'] ?? null,
+    ]);
+
+    return response()->json([
+        'message' => 'Thought updated successfully',
+        'data'    => $thought->load('tag'),
+    ]);
+    }
+
 
     /**
      * Remove the specified resource from storage.
@@ -101,4 +141,26 @@ class ThoughtController extends Controller
     {
         //
     }
+
+    public function editData($id)
+    {
+    $thought = \App\Models\Thought::with('tag', 'title')
+        ->findOrFail($id);
+
+    if ($thought->title->user_id !== auth()->id()) {
+        return response()->json(['message' => 'Forbidden'], 403);
+    }
+
+    return response()->json([
+        'id'     => $thought->id,
+        'year'   => $thought->year,
+        'month'  => $thought->month,
+        'day'    => $thought->day,
+        'part'   => $thought->part,
+        'thought'=> $thought->thought,
+        'link'   => $thought->link,
+        'tag'    => $thought->tag?->tag,
+    ]);
+    }
+
 }
