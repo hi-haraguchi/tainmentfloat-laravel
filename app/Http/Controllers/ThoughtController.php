@@ -137,10 +137,22 @@ class ThoughtController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Thought $thought)
+    public function destroy($id)
     {
-        //
+    $thought = \App\Models\Thought::with('title')->findOrFail($id);
+
+    // 自分のTitleに紐づいているかチェック
+    if ($thought->title->user_id !== auth()->id()) {
+        return response()->json(['message' => 'Forbidden'], 403);
     }
+
+    $thought->delete();
+
+    return response()->json([
+        'message' => 'Thought deleted successfully'
+    ]);
+    }
+
 
     public function editData($id)
     {
@@ -153,6 +165,7 @@ class ThoughtController extends Controller
 
     return response()->json([
         'id'     => $thought->id,
+        'title_id' => $thought->title_id,
         'year'   => $thought->year,
         'month'  => $thought->month,
         'day'    => $thought->day,
