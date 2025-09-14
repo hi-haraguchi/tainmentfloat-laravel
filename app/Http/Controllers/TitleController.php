@@ -52,6 +52,19 @@ class TitleController extends Controller
             'link'    => 'nullable|string',
         ]);
 
+        // 日本語 → 数字 のマップ
+        $map = [
+            '本' => 0,
+            'マンガ' => 1,
+            '映画' => 2,
+            '音楽' => 3,
+            'ポッドキャスト' => 4,
+            'TV・動画配信サービス' => 5,
+        ];
+
+        // kind を算出
+        $kind = $map[$validated['genre']] ?? null;
+
         // Tag処理（あれば取得、なければ新規作成）
         $tagId = null;
         if (!empty($validated['tag'])) {
@@ -78,6 +91,21 @@ class TitleController extends Controller
             'tag_id'  => $tagId,
             'link'    => $validated['link'] ?? null,
         ]);
+
+
+        // LastRecord 更新（全体用）
+        \App\Models\LastRecord::updateOrCreate(
+        ['user_id' => $request->user()->id, 'kind' => null], 
+        ['last_recorded_at' => now()]
+        );
+
+        // LastRecord 更新（ジャンル用）
+        if (!is_null($kind)) {
+            \App\Models\LastRecord::updateOrCreate(
+                ['user_id' => $request->user()->id, 'kind' => $kind],
+                ['last_recorded_at' => now()]
+            );
+        }
 
         // レスポンス（Titleに紐づくThoughtとTagをまとめて返す）
         return response()->json([

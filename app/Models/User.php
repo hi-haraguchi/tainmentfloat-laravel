@@ -57,4 +57,45 @@ class User extends Authenticatable
     return $this->belongsToMany(Thought::class, 'bookmarks')
                 ->withTimestamps();
     }
+
+    public function lastRecords() {
+    return $this->hasMany(LastRecord::class);
+    }
+
+    public function intervals() {
+    return $this->hasMany(Interval::class);
+    }
+
+    public function remindSetting() {
+    return $this->hasOne(RemindSetting::class);
+    }
+
+    protected static function booted()
+    {
+    static::created(function ($user) {
+        // 全体レコード
+        LastRecord::create([
+            'user_id' => $user->id,
+            'kind' => null,
+            'last_recorded_at' => null,
+        ]);
+
+        // 6ジャンル分のintervals
+        for ($kind = 0; $kind <= 5; $kind++) {
+            Interval::create([
+                'user_id' => $user->id,
+                'kind' => $kind,
+                'interval_days' => null,
+                'use_custom' => false,
+            ]);
+        }
+
+        // remind_settings
+        RemindSetting::create([
+            'user_id' => $user->id,
+            'mode' => 0,
+        ]);
+    });
+    }
+
 }
