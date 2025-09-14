@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class LastRecord extends Model
+{
+    //
+    protected $fillable = [
+        'user_id',
+        'kind',
+        'last_recorded_at',
+    ];
+}
