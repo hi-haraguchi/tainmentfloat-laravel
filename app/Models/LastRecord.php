@@ -12,4 +12,8 @@ class LastRecord extends Model
         'kind',
         'last_recorded_at',
     ];
+
+    protected $casts = [
+        'last_recorded_at' => 'datetime',
+    ];
 }

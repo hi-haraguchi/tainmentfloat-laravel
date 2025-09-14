@@ -25,6 +25,16 @@ class ReminderController extends Controller
         $setting = RemindSetting::where('user_id', $request->user()->id)->first();
         $setting->update(['mode' => $request->mode]);
 
+        if ($request->mode == 1) {
+        // 🔽 カスタムモードON → 全ジャンル use_custom = true
+        Interval::where('user_id', $request->user()->id)
+            ->update(['use_custom' => true]);
+        } else {
+        // 🔽 デフォルト or リマインドなし → 全ジャンル use_custom = false
+        Interval::where('user_id', $request->user()->id)
+            ->update(['use_custom' => false]);
+        }
+
         return response()->json(['success' => true]);
     }
 

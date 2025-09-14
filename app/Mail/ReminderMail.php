@@ -23,7 +23,7 @@ class ReminderMail extends Mailable
      */
     public function __construct(User $user, ?Title $lastTitle = null, int $days = 14)
     {
-        $this->user = $user;
+        $this->user = $user->only(['id', 'email']);
         $this->lastTitle = $lastTitle;
         $this->days = $days;
     }
@@ -44,7 +44,12 @@ class ReminderMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.reminder', // Blade テンプレートのパス
+            view: 'emails.reminder',
+            with: [
+                'user'      => $this->user,
+                'lastTitle' => $this->lastTitle,
+                'days'      => $this->days,
+            ],
         );
     }
 

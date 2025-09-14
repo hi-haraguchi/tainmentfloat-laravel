@@ -1,4 +1,4 @@
-<p>{{ $user->name }}さん、前回の登録から {{ $days }}日 がたちました。</p>
+<p>{{ $user['email'] }}さん、前回の登録から {{ $days }}日 がたちました。</p>
 
 @if($lastTitle)
 <p>前回は「<strong>{{ $lastTitle->title }}</strong>」を楽しまれたようです。</p>
