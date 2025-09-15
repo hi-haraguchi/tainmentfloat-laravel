@@ -17,12 +17,6 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 
 
-// 認証しているユーザー情報を返すAPI
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-
 // 登録
 Route::post('/register', [RegisteredUserController::class, 'store']);
 
@@ -45,6 +39,11 @@ Route::get('/verify-email/{id}/{hash}', [VerifyEmailController::class, '__invoke
 Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
     ->middleware(['auth:sanctum', 'throttle:6,1']);
 
+
+// 認証しているユーザー情報を返すAPI
+Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
+    return $request->user();
+});
 
 
 // ここから下はすべて認証必須

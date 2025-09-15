@@ -21,7 +21,8 @@ class AuthenticatedSessionController extends Controller
         return response()->json(['message' => 'Unauthorized'], 401);
     }
 
-    $user = $request->user();
+    $user = Auth::guard('web')->user();
+    // $user = $request->user();
 
     // ここでAPIトークンを発行
     $token = $user->createToken('api_token')->plainTextToken;
@@ -36,7 +37,11 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request)
     {
     // 現在のトークンを削除
-    $request->user()->currentAccessToken()->delete();
+    $user = $request->user();
+
+    if ($user && $user->currentAccessToken()) {
+        $user->currentAccessToken()->delete();
+    }
 
     return response()->json(['message' => 'Logged out']);
     }
