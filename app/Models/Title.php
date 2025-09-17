@@ -13,6 +13,7 @@ class Title extends Model
     protected $fillable = [
         'user_id',
         'genre',
+        'kind',
         'title',
         'author',
         'like',

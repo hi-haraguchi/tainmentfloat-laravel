@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->unsignedTinyInteger('kind')->nullable(); // null=全体, 0=book,1=manga 2=movie 3=音楽 4=ポッドキャスト 5=TVや配信
             $table->timestamp('last_recorded_at')->nullable();
+            $table->timestamp('last_reminded_at')->nullable();
             $table->timestamps();
         });
     }

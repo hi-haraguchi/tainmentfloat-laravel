@@ -11,9 +11,11 @@ class LastRecord extends Model
         'user_id',
         'kind',
         'last_recorded_at',
+        'last_reminded_at', 
     ];
 
     protected $casts = [
         'last_recorded_at' => 'datetime',
+        'last_reminded_at'  => 'datetime',
     ];
 }
