@@ -60,6 +60,7 @@ class TitleController extends Controller
             '音楽' => 3,
             'ポッドキャスト' => 4,
             'TV・動画配信サービス' => 5,
+            'その他' => 6,
         ];
 
         // kind を算出
@@ -76,6 +77,7 @@ class TitleController extends Controller
         $title = Title::create([
             'user_id' => $request->user()->id,
             'genre'   => $validated['genre'],
+            'kind'    => $kind,
             'title'   => $validated['title'],
             'author'  => $validated['author'],
             'like'    => false,
@@ -152,8 +154,20 @@ class TitleController extends Controller
         'like'   => 'boolean',
     ]);
 
-    // 更新
-    $title->update($validated);
+        $map = [
+            '本' => 0,
+            'マンガ' => 1,
+            '映画' => 2,
+            '音楽' => 3,
+            'ポッドキャスト' => 4,
+            'TV・動画配信サービス' => 5,
+            'その他' => 6,
+        ];
+        $kind = $map[$validated['genre']] ?? null;
+
+        $title->update(array_merge($validated, [
+            'kind' => $kind,
+        ]));
 
         return response()->json([
             'message' => 'Title updated successfully',
