@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('titles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('genre', 50);
+            $table->string('genre');
+            $table->unsignedTinyInteger('kind');
             $table->string('title');
             $table->string('author');
             $table->boolean('like')->default(false);
