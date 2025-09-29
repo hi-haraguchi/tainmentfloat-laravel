@@ -20,7 +20,7 @@ class TagController extends Controller
             $q->whereHas('title', function ($q2) {
                 $q2->where('genre', '!=', 'その他'); // 「その他」を除外
             })->with(['title' => function ($q3) {
-                $q3->select('id', 'genre', 'title', 'author');
+                $q3->select('id', 'genre', 'kind','title', 'author');
             }]);
         }])
         ->get()
@@ -32,6 +32,7 @@ class TagController extends Controller
                     return [
                         'thought_id' => $thought->id,
                         'genre'      => $thought->title->genre,
+                        'kind'       => $thought->title->kind, 
                         'title'      => $thought->title->title,
                         'author'     => $thought->title->author,
                         'part'       => $thought->part,

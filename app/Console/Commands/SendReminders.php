@@ -9,26 +9,23 @@ use App\Models\User;
 
 class SendReminders extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'reminders:send';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Send reminder emails to users based on their settings';
 
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
         $users = User::with(['lastRecords', 'intervals', 'remindSetting', 'titles'])->get();
+
+        // kind → ジャンル名マップ
+        $genreMap = [
+            0 => '本',
+            1 => 'マンガ',
+            2 => '映画',
+            3 => '音楽',
+            4 => 'ポッドキャスト',
+            5 => 'TV・動画配信サービス',
+            6 => 'その他',
+        ];
 
         foreach ($users as $user) {
             $mode = $user->remindSetting->mode ?? 0;
@@ -45,8 +42,13 @@ class SendReminders extends Command
                             $last->last_reminded_at->lt(now()->subDays(14))
                         )
                     ) {
-                        // メール送信
-                        Mail::to($user->email)->send(new ReminderMail($user, null, 14));
+                        // 最新タイトル（全体）
+                        $lastTitle = $user->titles()->latest()->first();
+
+                        // メール送信（ジャンル名は null）
+                        Mail::to($user->email)->send(
+                            new ReminderMail($user, $lastTitle, 14, null)
+                        );
                         $this->info("Default reminder sent to {$user->email}");
 
                         // ★ 全体(null)を更新
@@ -74,9 +76,13 @@ class SendReminders extends Command
                                     $last->last_reminded_at->lt(now()->subDays($interval->interval_days))
                                 )
                             ) {
+                                // 最新タイトル（ジャンル別）
+                                $lastTitle = $user->titles()->where('kind', $interval->kind)->latest()->first();
+                                $genreName = $genreMap[$interval->kind] ?? null;
+
                                 // メール送信
                                 Mail::to($user->email)->send(
-                                    new ReminderMail($user, null, $interval->interval_days)
+                                    new ReminderMail($user, $lastTitle, $interval->interval_days, $genreName)
                                 );
                                 $this->info("Custom reminder sent to {$user->email} (kind={$interval->kind})");
 

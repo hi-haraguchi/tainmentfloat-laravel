@@ -106,12 +106,13 @@ class BookmarkController extends Controller
     $user = $request->user();
 
     $bookmarks = $user->bookmarks()
-        ->with(['title:id,genre,title,author', 'tag:id,tag'])
+        ->with(['title:id,genre,kind,title,author', 'tag:id,tag'])
         ->get()
         ->map(function ($thought) {
             return [
                 'thought_id' => $thought->id,
                 'genre'      => $thought->title->genre,
+                'kind'      => $thought->title->kind,
                 'title'      => $thought->title->title,
                 'author'     => $thought->title->author,
                 'part'       => $thought->part,

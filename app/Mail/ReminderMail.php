@@ -17,15 +17,17 @@ class ReminderMail extends Mailable
     public $user;
     public $lastTitle;
     public $days;
+    public $genreName;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(User $user, ?Title $lastTitle = null, int $days = 14)
+    public function __construct(User $user, ?Title $lastTitle = null, int $days = 14, ?string $genreName = null)
     {
         $this->user = $user->only(['id', 'email']);
         $this->lastTitle = $lastTitle;
         $this->days = $days;
+        $this->genreName = $genreName;
     }
 
     /**
@@ -34,7 +36,7 @@ class ReminderMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'エンタメのリマインド',
+            subject: '【エンタメフロート】忙しい方へのリマインドです',
         );
     }
 
@@ -49,6 +51,7 @@ class ReminderMail extends Mailable
                 'user'      => $this->user,
                 'lastTitle' => $this->lastTitle,
                 'days'      => $this->days,
+                'genreName'  => $this->genreName,
             ],
         );
     }
