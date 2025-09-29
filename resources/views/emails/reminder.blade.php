@@ -40,7 +40,7 @@
 <body>
   <div class="container">
     <div class="logo">
-      <img src="{{ config('app.url') }}/tf-rogo-p22.png" alt="エンタメフロート ロゴ" width="200">
+      <img src="https://www.tainment-float.com/ogp_00_01.png" alt="エンタメフロート ロゴ" width="200">
     </div>
 
     <!-- <p class="title">{{ $user['email'] }} さん</p> -->
@@ -55,8 +55,8 @@
 
     <p>もしお時間や体力がゆるすのであれば<Br>新しいエンタメを楽しまれてください！</p>
 
-    <a href="{{ config('app.url') }}/" class="btn">アプリを開く</a>
-
+    <a href="https://www.tainment-float.com/" class="btn">アプリを開く</a>
+    
     <div class="footer" style="margin-top:30px; font-size:12px; color:#666; text-align:left;">
       <p style="margin:0;">※このメールは自動送信されています。</p>
       <p style="margin:0;">※リマインドメールを止める場合は、ログイン後に（その他）メニューのリマインド設定から変更してください</p>
