@@ -241,6 +241,7 @@ class TitleController extends Controller
             $timeline[$year][$month][] = [
                 'id'     => $title->id,
                 'genre'  => $title->genre,
+                'kind'   => $title->kind, 
                 'title'  => $title->title,
                 'author' => $title->author,
                 'thought'=> $thought->thought,
