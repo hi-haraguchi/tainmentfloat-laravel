@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\ResetPasswordJa;
 
 class User extends Authenticatable
 {
@@ -97,6 +98,11 @@ class User extends Authenticatable
             'mode' => 0,
         ]);
     });
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordJa($token));
     }
 
 }
